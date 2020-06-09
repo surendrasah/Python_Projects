@@ -1,0 +1,1 @@
+This is an example of tkinter to create a GUI. This GUI will have button which ask for filename and then few entry box to put your response. You need to put your own image here at: img_open = Image.open("altran.png")
