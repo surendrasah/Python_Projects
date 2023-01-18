@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  osmdb:
+    image: osmfileload
+    build: osm_python
+    volumes:
+      - ./osm_python:/app
+      - data:/app/data
+    ports:
+      - "8080:8080"
+    #command: python3 /app/osm_python/osm.py
+
+
+  web:
+    image: osmflask
+    build: osm_flask
+    volumes:
+      - ./osm_flask:/app
+      - data:/app/data
+    ports:
+      - "5000:5000"
+    #command: sh -c "sleep 50s" # ; python3 /app/osm_flask/osm_app.py
+    depends_on: 
+      - osmdb
+
+#for creating a new volume
+volumes:
+  data:
+
+
+
+
