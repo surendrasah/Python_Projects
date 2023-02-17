@@ -1,0 +1,40 @@
+We kindly ask you to solve the following code challenge as part of our selection process.
+Addressline
+An address provider returns addresses only with concatenated street names and numbers. Our own system on the other hand has separate fields for street name and street number.
+Input: string of address
+Output: string of street and string of street-number as JSON object
+1.	Write a simple program that does the task for the most simple cases, e.g.
+i.	"Winterallee 3" -> {"street": "Winterallee", "housenumber": "3"}
+ii.	"Musterstrasse 45" -> {"street": "Musterstrasse", "housenumber": "45"}
+iii.	"Blaufeldweg 123B" -> {"street": "Blaufeldweg", "housenumber": "123B"}
+2.	Consider more complicated cases
+i.	"Am Bächle 23" -> {"street": "Am Bächle", "housenumber": "23"}
+ii.	"Auf der Vogelwiese 23 b" -> {"street": "Auf der Vogelwiese", "housenumber": "23 b"}
+3.	Consider other countries (complex cases)
+i.	"4, rue de la revolution" -> {"street": "rue de la revolution", "housenumber": "4"}
+ii.	"200 Broadway Av" -> {"street": "Broadway Av", "housenumber": "200"}
+iii.	"Calle Aduana, 29" -> {"street": "Calle Aduana", "housenumber": "29"}
+iv.	"Calle 39 No 1540" -> {"street": "Calle 39", "housenumber": "No 1540"}
+Your Task: Solve the task using your best programming skills and share the code in a public repository via a public hoster like Github. Contact us via jobs@friday.de.
+When choosing your approach of implementation, please keep following things in mind:
+•	While we will try to evaluate all code that is sent to us, keep in mind that we will feel most comfortable with the tools we know:
+o	Python
+o	Pandas
+o	PySpark
+o	SQL
+•	We prefer quality over speed. It does not only matter if your solution yields correct results, but we will also take a close look on your overall project structure, the tools used, test coverage, documentation, etc.
+
+
+I was rejected because of the below.
+
+We really appreciate that you took the time to consider us, getting to know us and pursuing a career at FRIDAY. We enjoyed the conversations and learning more about you, your skills and your accomplishments.
+
+We took your application into careful consideration. Unfortunately, we have to inform you that we will not continue the recruitment process with you.
+
+Thank you for participating in our code challenge. Unfortunately, your solution did not convince us that you could be the right fit for the position we are looking for. While your solution works for the given examples, we would have loved to see more examples, automated tests, modern Python features like type annotations, a unified interface instead of three functions." 
+
+We also want to extend every hope that your job search will end successfully shortly for you.
+
+We will be advertising more positions in the coming months. We hope you’ll keep us in mind and we encourage you to apply again.
+
+Best regards,

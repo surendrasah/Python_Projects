@@ -1,0 +1,26 @@
+Data Engineering Challenge
+1. The Challenge
+Demonstrate your data engineering skills:
+Set up a SQL database to be run inside a docker container, store the attached dataset in a
+normalized (3rd normal form (3NF)) way in the database. BONUS: While you do this, establish
+database versioning and make it reproducible, such that the database with final schema and
+populated data can be reproduced with a simple script (best case: just using a “docker run …”
+command).
+2. Requirements
+1. Review the provided dataset. Make sure you understand and document each field and their
+relationships.
+2. Provide a docker setup (image or compose) that can spin up and run a container running the
+database.
+3. Provide the scripts that set up the database schema for storing the data in 3NF.
+4. Upload and store the data and provide us with the script(s) to do so.
+5. BONUS: Automate everything in such a way that the empty database (with just the 3NF
+schema) and the final populated database can be reproduced with a simple script or best case a
+single command.
+6. Document your work and code.
+3. Expected time-frame
+Time-box your work on this challenge to 3 hours max. We do not expect a perfect solution, but
+are keen on learning more about how you work.
+4. Deliverables
+Send us your challenge submission as a link to a github/gitlab repository or a zip-file containing
+all the code/data/docs. Looking forward to your submission, we thank you and wish you the best
+of success!
