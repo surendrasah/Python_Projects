@@ -1,0 +1,24 @@
+Data Engineer Test
+This is a small data engineering test to check your ability to work with data and prepare it for
+use in analysis.
+Task overview: Extract data from an API, make some transformations to it, and then load it to a
+(cloud/local) relational database of your choice. Document everything so that we can replicate
+your work.
+Detailed steps:
+1. Sign up for an API key at https://newsapi.org/
+2. Use your API key to call the /everything/ method for all articles with the keyword
+‘Commerzbank’.
+3. Remove any articles where the source ID is empty.
+4. Call the /sources/ method for all sources.
+5. Load the data as two tables on a cloud analytics database (example Google BigQuery or
+Amazon Redshift) or setup your own database using docker.
+6. Write a simple SQL script to join the data from /everything/ with data from /sources/
+Tables.
+7. Setup your code to run in a docker container.
+There should be no costs for you to do this if you run everything on the Google Cloud free tier
+(more info here: https://cloud.google.com/free/)
+What to provide:
+● All scripts you use, in whatever language (although Python is preferred) including
+Dockerfile or docker-compose.yml
+● Provide a documentation on how to run your code, including Screenshots if you are
+using a UI at any stage and not scripts
