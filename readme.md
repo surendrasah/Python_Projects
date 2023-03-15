@@ -51,9 +51,72 @@ you have created in the database. Make sure the appropriate config is in the doc
 
 # docker_compose_mysql_environmentdata
 The data relates to environmental profiles and layers, with information about the location, depth range, and organic matter content of the layers.
-This program contains config.yml, csv file and 
+This program contains config.yml (to store sensitive information), csv file(data) and schema in schema.sql 
 
-volumes:
-      
+    volumes:
       - ./data/table_schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+# loaddata_share_volume_docker-compose-main
+It loads data (csv file) and create api get request (flask api). It has also unittest program
+The docker-compose.yml file shares the volume between the services. The python program sleeps for sometime inorder to wait for database to get live.
+
+    volumes:
+      - ./osm_python:/app
+      - data:/app/data
+      
+      volumes:
+      - ./osm_flask:/app
+      - data:/app/data
+
+# postgresql-ETL
+It is an ETL project for an imaginary startup called Sparkify. This project create a database based on a star schema. There's 1 Fact table and 4 Dim tables. 
+All the raw data is stored in JSON Files. This project create an ETL pipeline to obtain all the information from JSON files with the help of pandas python library and insert the data into the database schema.
+sql_queries.py looks like
+
+    #DROP TABLES
+    songplay_table_drop = "DROP TABLE IF EXISTS songplays"
+    user_table_drop = "DROP TABLE IF EXISTS users"
+    song_table_drop = "DROP TABLE IF EXISTS songs"
+    artist_table_drop = "DROP TABLE IF EXISTS artists"
+    time_table_drop = "DROP TABLE IF EXISTS time"
+
+    #CREATE TABLES
+    songplay_table_create = ("""CREATE TABLE IF NOT EXISTS songplays \
+    (songplay_id SERIAL PRIMARY KEY, \
+    start_time bigint NOT NULL, user_id int NOT NULL, level varchar, song_id varchar, \
+    artist_id varchar, session_id int, location varchar, user_agent varchar);
+    """)
     
+    #INSERT RECORDS
+
+    songplay_table_insert = ("""INSERT INTO songplays (start_time, user_id, level, song_id, \
+    artist_id, session_id, location, user_agent) \
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """)
+
+    user_table_insert = ("""INSERT INTO users (user_id, first_name, last_name, gender, level) \
+    VALUES (%s, %s, %s, %s, %s) \
+    ON CONFLICT (user_id)\
+    DO UPDATE SET level = EXCLUDED.level;""")
+    
+    # QUERY LISTS
+    create_table_queries = [songplay_table_create, user_table_create,
+                            song_table_create, artist_table_create, time_table_create]
+    drop_table_queries = [songplay_table_drop, user_table_drop,
+                          song_table_drop, artist_table_drop, time_table_drop]
+
+And in the program, use it like below:
+
+    def drop_tables(cur, conn):
+        for query in drop_table_queries:
+            cur.execute(query)
+            conn.commit()
+            
+# python_flask_unittest   
+There are three folders.
+
+GetRequest- I have used GET request to fetch the data.
+
+PostRequest- I have used POST request to send and retrieve the data.
+
+unittest- program to test the input conditions.
