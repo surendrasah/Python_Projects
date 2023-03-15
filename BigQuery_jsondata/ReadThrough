@@ -21,6 +21,7 @@ raw json data:
 source has id and name .
 
 https://cloud.google.com/bigquery/docs/nested-repeated
+Also read on when to use repeated mode, bigquery.SchemaField("source", "RECORD", mode="REPEATED",
 bigquery schema:
     table.schema = [
                 bigquery.SchemaField("source", "RECORD", mode="NULLABLE",
