@@ -1,0 +1,4 @@
+Ideas used:
+bigquery_service_account_file.json is empty. One needs to add here.
+Set environment variable for service account file path in Dockerfile
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/bigquery_service_account_file.json
