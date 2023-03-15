@@ -2,3 +2,79 @@ Ideas used:
 bigquery_service_account_file.json is empty. One needs to add here.
 Set environment variable for service account file path in Dockerfile
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/bigquery_service_account_file.json
+
+raw json data:
+"articles":[
+{"source":{"id":null,"name":"heise online"},
+"author":"dpa","title":"Prestigeträchtige Rückkehr: Commerzbank wieder im Dax",
+"description":"Die Commerzbank ist wieder im Dax gelistet. Fast viereinhalb Jahre nach dem Abstieg kehrt das Institut zurück in den Börsenleitindex.",
+"url":"https://www.heise.de/news/Prestigetraechtige-Rueckkehr-Commerzbank-wieder-im-Dax-7528551.html",
+"urlToImage":"https://heise.cloudimg.io/bound/1200x1200/q85.png-lossy-85.webp-lossy-85.foil1/_www-heise-de_/imgs/18/3/7/0/8/6/8/4/shutterstock_421955908-7a8e8d63ffd67f4d.jpg",
+"publishedAt":"2023-02-27T10:39:00Z","content":"Die Commerzbank ist wieder zurück im Dax. Fast viereinhalb Jahre nach dem Abstieg kehrte das Frankfurter Geldhaus am Montag in die oberste deutsche Börsenliga zurück. Damit zählt die Commerzbank wied… [+2565 chars]"},
+{"source":{"id":null,"name":"Faz.net"},
+"author":"Hanno Mußler","title":"Commerzbank teurer als Deutsche Bank",
+"description":"Erstmals seit Juni 2019 kostet eine Aktie der gelben Bank mehr als die der blauen. Durch tiefe Kurstäler mussten beide. Wer jetzt mehr Kurspotential hat, ist für Analysten eindeutig.",
+"url":"https://www.faz.net/aktuell/finanzen/aktienkurse-commerzbank-schlaegt-deutsche-bank-im-vergleich-18733656.html",
+"urlToImage":"https://media0.faz.net/ppmedia/aktuell/wirtschaft/312566938/1.8125100/facebook_teaser_fplus/banken-im-schatten.jpg",
+"publishedAt":"2023-03-09T05:42:01Z","content":"Damit kein Missverständnis aufkommt: Die Deutsche Bank ist mit einem aktuellen Unternehmenswert von 24 Milliarden Euro an der Börse deutlich wertvoller als die Commerzbank mit 15 Milliarden Euro. Mit… [+1128 chars]"}
+....
+source has id and name .
+
+https://cloud.google.com/bigquery/docs/nested-repeated
+bigquery schema:
+    table.schema = [
+                bigquery.SchemaField("source", "RECORD", mode="NULLABLE",
+                fields=[
+                        bigquery.SchemaField("id", "STRING", mode="NULLABLE"),
+                        bigquery.SchemaField("name", "STRING", mode="NULLABLE")
+                        ]),
+                bigquery.SchemaField("author", "STRING", mode="NULLABLE"),
+                bigquery.SchemaField("title", "STRING", mode="NULLABLE"),
+                bigquery.SchemaField("description", "STRING", mode="NULLABLE"),
+                bigquery.SchemaField("url", "STRING", mode="NULLABLE"),
+                bigquery.SchemaField("urlToImage", "STRING", mode="NULLABLE"),
+                bigquery.SchemaField("publishedAt", "TIMESTAMP", mode="NULLABLE"),
+                bigquery.SchemaField("content", "STRING", mode="NULLABLE")
+            ]
+   
+   # Load the articles data into the 'articles' table
+    filtered_articles = apicall_commerzbank()
+    rows_to_insert = [{
+        "source": {"id": row["source"]["id"], "name": row["source"]["name"]},
+        "author": row["author"],
+        "title": row["title"],
+        "description": row["description"],
+        "url": row["url"],
+        "urlToImage": row["urlToImage"],
+        "publishedAt": row["publishedAt"],
+        "content": row["content"],
+        }for row in filtered_articles]
+ 
+ 
+ 
+ "sources":[{"id":"abc-news","name":"ABC News",
+ "description":"Your trusted source for breaking news, analysis, exclusive interviews, headlines, and videos at ABCNews.com.",
+ "url":"https://abcnews.go.com","category":"general","language":"en","country":"us"},
+ {"id":"abc-news-au","name":"ABC News (AU)",
+ "description":"Australia's most trusted source of local, national and world news. Comprehensive, independent, in-depth analysis, the latest business, sport, weather and more.",
+ "url":"http://www.abc.net.au/news","category":"general","language":"en","country":"au"},
+ {"id":"aftenposten","name":"Aftenposten",
+ "description":"Norges ledende nettavis med alltid oppdaterte nyheter innenfor innenriks, utenriks, sport og kultur.",
+ "url":"https://www.aftenposten.no","category":"general","language":"no","country":"no"
+            
+# Create the 'sources' table
+    table_id = "sources"
+    table = bigquery.Table(dataset.table(table_id))
+    table.schema = [ bigquery.SchemaField("id", "STRING"),    bigquery.SchemaField("name", "STRING"),    bigquery.SchemaField("description", "STRING"),    bigquery.SchemaField("url", "STRING"),    bigquery.SchemaField("category", "STRING"),    bigquery.SchemaField("language", "STRING"),    bigquery.SchemaField("country", "STRING"),]
+    table = client.create_table(table,exists_ok=True)
+    print(f"Table {table.table_id} created successfully.")
+
+    # Load the sources data into the 'sources' table
+    sources = apicall_source()
+
+    rows_to_insert = [(source["id"], source["name"], source["description"], source["url"], source["category"], source["language"], source["country"]) for source in sources ]
+    errors = client.insert_rows(table, rows_to_insert)            
+            
+           
+            
+            
