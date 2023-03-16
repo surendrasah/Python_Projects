@@ -37,9 +37,9 @@ bigquery schema:
 # dataingestion_flaskapi_etl-main
 An ingestion system for two data streams. It must accept HTTP messages. Example files are provided for both streams. The first stream named 'metrics.json' is an example of machine data. The second, 'workorder.json', defines what product ran when and how much output was produced. Persist this data. (time relates the two data sources). An ETL pipeline that reads the data from step 1, and finds the top three parameters that correlate to the production output of each product, and output them in a static report.
 
-python3 data_app_ingestion.py : web api flask server proram
-python3 data_post_request.py : load the data to database using post request
-python3 data_store_etl.py : Etl program to read the data and correlation between product and production output
+    python3 data_app_ingestion.py : web api flask server proram
+    python3 data_post_request.py : load the data to database using post request
+    python3 data_store_etl.py : Etl program to read the data and correlation between product and production output
 
 # deploy_lambda_with_terraform-main
 Use terraform main.tf to execute lambda function
