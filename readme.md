@@ -71,8 +71,10 @@ The docker-compose.yml file shares the volume between the services. The python p
       - data:/app/data
 
 ## docker-compose postgresql
-This has postgresql db and api data request (json)
-It has database.ini
+This has postgresql db and api data request (json). 
+
+It has database.ini :
+
         [postgresql]
         host=localhost
         database=cocktaildb
