@@ -1,0 +1,3 @@
+# Add .env to .gitignore, then set the credentials within the .env file like
+# Store the .env file locally or in a secure location where the rest of the team can grab it.
+# .env

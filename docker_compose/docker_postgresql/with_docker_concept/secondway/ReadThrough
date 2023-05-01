@@ -1,0 +1,184 @@
+There's two libraries: psycopg2 and psycopg2-binary
+we're only just starting (and I'm assuming most students are fairly new to software development and programming), you should use psycopg2-binary only.
+Don't install psycopg2 at all, and certainly don't install both packages. That's because when you install psycopg2-binary, it will just work.
+To install psycopg2 there are a bunch of prerequisites that you probably won't have already installed.
+In addition, you'll have to find some files and programs in your computer that can be quite difficult to find!
+
+The difference between the two is that:
+the binary package is a practical choice for development and testing but in production it is advised to use the package built from sources, whereas
+building psycopg requires a few prerequisites (a C compiler, some external development library packages)
+======
+
+Here, the docker-compose and Dockerfile are used to run the same program.
+
+=================================================================================
+I want to use .env file or some security way to pass sensitive information
+
+env can be used to pass the information to the container
+With a dedicated env file: vim vars.env ,write the secret here in vars.env like
+MYVAR=”Xavki” and MYENV=”Development”
+
+SOME_USERNAME=myUser
+SOME_PWD_VAR=myPwd
+
+--docker run -d --name c1 --env-file vars.env ubuntu:latest sleep 3600s
+
+--docker run -d --name c1 -e MYVAR="Xavki"  ubuntu:latest sleep 3600
+Within docker-compose.yml, you can specify a file that contains the environment variables for the container:
+
+ env_file:
+	- .env
+
+Make sure to add .env to .gitignore, then set the credentials within the .env file like
+Store the .env file locally or in a secure location where the rest of the team can grab it.
+It is not necessary to include env_file in the docker-compose and the .env file was read automatically by docker-compose
+===========================================================
+
+docker-compose up
+and
+docker-compose up --build  incase of rebuild
+
+docker-compose down
+
+Few things to explain:
+At first, docker-compose has postgres credentails and Dockerfile has also it to connect with program.
+Even the program has it. So, I need to make sure how to use these.
+
+To test the containerid if the databse has the data
+docker ps -a
+docker exec -it containerid /bin/bash
+
+psql -U postgres
+\l
+
+\c cocktaildb
+
+\dt
+
+I noticed that
+the program loads the data to db but it keeps restarting the container as the connection was closing which i was used
+in the program.
+
+so I changed the restart: on-failure
+and issue was resolved.
+The restart setting in the docker-compose.yml file specifies the restart policy for the container.
+
+The restart: always setting means that Docker will always restart the container if it exits,regardless of the exit code.
+This is useful for ensuring that the container is always running, even if there is a failure or the host machine is
+restarted. Other options for the restart setting include no (never restart), on-failure (restart only if the container
+exits with a non-zero exit code), and unless-stopped (restart unless the container is explicitly stopped by the user).
+
+Setting restart: on-failure will restart the container only when the container fails, which could be useful
+in case of unexpected errors or crashes.
+
+================================================
+version: '3.8'
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
+    #env_file:
+      #- .env
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    restart: on-failure
+    environment:
+      DB_HOST: ${POSTGRES_HOST}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+    depends_on:
+      - db
+
+Note:
+the DB_HOST environment variable used in the app service's environment section is set to ${POSTGRES_HOST},
+which should be defined in an .env file or as an environment variable. Since the value of ${POSTGRES_HOST} is db,
+the app service will connect to the db service as its database host.
+
+I tried using as the host name as 'host' but it generates error.
+If you use the hostname host for the DB_HOST environment variable in the app service, the application container
+will try to connect to a PostgreSQL server running on the host machine (i.e., the machine where Docker is installed).
+
+This might work if you have a PostgreSQL server running locally on your machine and listening on the default PostgreSQL
+port (5432), but if not, you will get an error similar to the one you got earlier:
+
+app_1  | could not connect to server: Connection refused
+app_1  | 	Is the server running on host "host" (127.0.0.1) and accepting
+app_1  | 	TCP/IP connections on port 5432?
+
+Also, keep in mind that if you are running Docker on a remote machine, using host as the DB_HOST might not work,
+since the hostname host would refer to the remote machine itself, not your local machine.
+In this case, you would need to use the IP address or hostname of your local machine instead.
+===========================
+sometimes the app service fails as the db service is not up.
+so we have try to run
+docker-compose up --build two or more times.
+I am trying something different below.
+
+version: '3.8'
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./data_db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data_db:/var/lib/postgresql/datastorage
+    #env_file:
+      #- .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -U postgres" ]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    restart: on-failure
+    environment:
+      DB_HOST: ${POSTGRES_HOST}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+You can use the healthcheck option in the db service to specify a health check command that checks the database connectivity.
+Then you can add a depends_on option to the app service, which will make it wait for the db service to become healthy before starting.
+In this example, the health check command for the db service is pg_isready -h localhost -U postgres,
+which checks if the PostgreSQL server is up and running and accepting connections.
+The health check interval is set to 10 seconds, the timeout is set to 20 seconds, and the number of retries is set to 5.
+The depends_on option for the app service is set to db, with a condition of service_healthy.
+This means that the app service will wait for the db service to become healthy before starting up.
+
+With this setup, Docker Compose will start the db service first, and then start the app service once the db service is healthy.
+
+===========
+For driver error:
+ERROR: for secondway_db_1  Cannot start service db: driver failed programming external connectivity on endpoint secondway_db_1
+sudo lsof -i :5432
+sudo kill -9 pid
+
+For removing network:
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+docker network prune
+docker-compose up
+
