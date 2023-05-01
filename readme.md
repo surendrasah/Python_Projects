@@ -61,7 +61,7 @@ you have created in the database. Make sure the appropriate config is in the doc
 ## loaddata_share_volume_docker-compose-main
 It loads data (csv file) and create api get request (flask api). It has also unittest program
 The docker-compose.yml file shares the volume between the services. The python program sleeps for sometime inorder to wait for database to get live.
-
+#### It uses sqlite
     volumes:
       - ./osm_python:/app
       - data:/app/data
